@@ -1,7 +1,10 @@
+from urllib import response
+
 import aiohttp
 import certifi
 import ssl
 from core.config import KODIK_API_KEY
+
 
 async def fetch_all_anime():
     async with aiohttp.ClientSession() as session:
@@ -15,17 +18,19 @@ async def fetch_all_anime():
             else:
                 return {"error": f"Request failed with status {response.status}"}
 
+
 async def fetch_anime(title: str):
     async with aiohttp.ClientSession() as session:
         ssl_context = ssl.create_default_context(cafile=certifi.where())
         async with session.get(
-                f'https://kodikapi.com/search?token={KODIK_API_KEY}&title={title}&limit=1',
+                f'https://kodikapi.com/search?token={KODIK_API_KEY}&title={title}',
                 ssl=ssl_context) as response:
             if response.status == 200:
                 data = await response.json()
                 return data
             else:
                 return {"error": f"Request failed with status {response.status}"}
+
 
 async def fetch_anime_by_id(anime_id: str):
     async with aiohttp.ClientSession() as session:
@@ -43,9 +48,23 @@ async def fetch_anime_by_id(anime_id: str):
                         "shikimori_id": result.get("shikimori_id", None),
                         "kodik_id": result.get("id", None),
                         "type": result.get("type", "serial"),
-                        "link": result.get("link", None),  # Добавляем link
-                        "translation": result.get("translation", None)  # Добавляем translation
+                        "link": result.get("link", None),
+                        "translation": result.get("translation", None)
                     }
                 return None
+            else:
+                return {"error": f"Request failed with status {response.status}"}
+
+
+async def fetch_anime_by_genre(genre: str):
+    async with aiohttp.ClientSession() as session:
+        ssl_context = ssl.create_default_context(cafile=certifi.where())
+        async with session.get(
+            f'https://kodikapi.com/genre/{genre}',
+            ssl=ssl_context
+        ) as resp:
+            if resp.status == 200:
+                data = resp.json()
+                return data
             else:
                 return {"error": f"Request failed with status {response.status}"}
