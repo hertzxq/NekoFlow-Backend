@@ -23,15 +23,15 @@ Base = declarative_base()
 class UsersModel(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    username: Mapped[str] = mapped_column()
-    email: Mapped[str] = mapped_column()
-    password: Mapped[str] = mapped_column()
+    username: Mapped[str] = mapped_column(nullable=False)
+    email: Mapped[str] = mapped_column(nullable=False)
+    password: Mapped[str] = mapped_column(nullable=False)
 
 
 async def init_db():
     try:
         async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
+            await conn.run_sync(UsersModel.metadata.create_all)
     except Exception as e:
         logger.error(f"Error creating tables: {e}")
         raise
